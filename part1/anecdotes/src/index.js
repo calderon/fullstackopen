@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState({})
 
   const randomBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -14,11 +15,20 @@ const App = (props) => {
     setSelected(rand);
   };
 
+  const handleVoteClick = () => {
+    const vote = {};
+    vote[selected] = (points[selected] || 0) + 1;
+    
+    setPoints({ ...points, ...vote });
+  };
+
   return (
     <div>
-      {props.anecdotes[selected]}
+      {props.anecdotes[selected]}.
+      <p>has {points[selected] || 0} votes </p>
       <div>
         <button onClick={handleNextAnecdoteClick}>next anecdote</button>
+        <button onClick={handleVoteClick}>vote</button>
       </div>
     </div>
   )
