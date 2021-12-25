@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
+import Anecdote from './anecdote';
+
 const App = (props) => {
   const [selected, setSelected] = useState(0)
-  const [points, setPoints] = useState({})
+  const [points, setPoints] = useState(new Array(6).fill(0))
 
   const randomBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -16,16 +18,17 @@ const App = (props) => {
   };
 
   const handleVoteClick = () => {
-    const vote = {};
-    vote[selected] = (points[selected] || 0) + 1;
+    const pointsCopy = [...points];
+    pointsCopy[selected] += 1;
     
-    setPoints({ ...points, ...vote });
+    setPoints(pointsCopy);
   };
 
   return (
     <div>
-      {props.anecdotes[selected]}.
-      <p>has {points[selected] || 0} votes </p>
+      <Anecdote anecdotes={anecdotes}
+                points={points}
+                index={selected} />
       <div>
         <button onClick={handleNextAnecdoteClick}>next anecdote</button>
         <button onClick={handleVoteClick}>vote</button>
