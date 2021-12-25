@@ -24,6 +24,10 @@ const App = (props) => {
     setPoints(pointsCopy);
   };
 
+  const someVote = points.some(point => point);
+  const maxPoints = Math.max(...points)
+  const indexMaxPoints = points.indexOf(maxPoints);
+
   return (
     <div>
       <Anecdote anecdotes={anecdotes}
@@ -33,6 +37,12 @@ const App = (props) => {
         <button onClick={handleNextAnecdoteClick}>next anecdote</button>
         <button onClick={handleVoteClick}>vote</button>
       </div>
+
+      {someVote &&
+        <Anecdote anecdotes={anecdotes}
+                  points={points}
+                  index={indexMaxPoints} />
+      }
     </div>
   )
 }

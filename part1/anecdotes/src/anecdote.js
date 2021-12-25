@@ -1,4 +1,4 @@
-const Anecdote = ({anecdotes, points = {}, index = 0}) => (
+const Anecdote = ({anecdotes, points = [], index = 0}) => (
   <>
     {anecdotes[index]}.
     <p>has {points[index] || 0} votes </p>
