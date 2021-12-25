@@ -1,6 +1,9 @@
 const Statistic = ({ text, value }) => {
   return (
-    <p>{text} {value}</p>
+    <tr>
+      <th>{text}</th>
+      <td>{value}</td>
+    </tr>
   )
 };
 

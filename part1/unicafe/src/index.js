@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
+import './index.css';
+
 import Button from './button';
 import Statistics from './statistics';
 
