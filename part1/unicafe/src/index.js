@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
+import Button from './button';
 import Statistics from './statistics';
 
 const App = () => {
@@ -9,25 +10,20 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  const handleGoodClick = () => {
-    setGood(good + 1);
-  };
-
-  const handleNeutralClick = () => {
-    setNeutral(neutral + 1);
-  };
-
-  const handleBadClick = () => {
-    setBad(bad + 1);
-  };
+  const handleGoodClick = () => setGood(good + 1);
+  const handleNeutralClick = () => setNeutral(neutral + 1);
+  const handleBadClick = () => setBad(bad + 1);
 
   return (
     <div>
       <h1>give feedback</h1>
-      <button onClick={handleGoodClick}>good</button>
-      <button onClick={handleNeutralClick}>neutral</button>
-      <button onClick={handleBadClick}>bad</button>
-      
+      <Button text="good"
+              onClick={handleGoodClick}>good</Button>
+      <Button text="neutral"
+              onClick={handleNeutralClick}>neutral</Button>
+      <Button text="bad"
+              onClick={handleBadClick}>bad</Button>
+
       <Statistics good={good}
                   neutral={neutral}
                   bad={bad} />
