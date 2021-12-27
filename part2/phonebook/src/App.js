@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
-import PersonAPI from './api/persons';
+import PersonService from './services/persons';
+
+import Notification from './Notification';
 import Filter from './Filter';
 import PersonForm from './PersonForm';
 
@@ -12,14 +13,14 @@ const App = () => {
   const [ searchTerm, setSearchTerm ] = useState('');
   const [ newName, setNewName ] = useState('');
   const [ newNumber, setNewNumber ] = useState('');
+  const [ notification, setNotification ] = useState({})
 
   useEffect(() => {
     const fetchPersons = async () => {
-      const api = new PersonAPI();
-      const response = await api.fetch();
-      setPersons(response.data);
+      const data = await PersonService.get();
+      setPersons(data);
 
-      return response.data;
+      return data;
     }
 
     fetchPersons();
@@ -39,11 +40,74 @@ const App = () => {
 
   const handlePersonFormSubmit = (evt) => {
     evt.preventDefault();
-    
-    setPersons(persons.concat({
-      name: newName,
-      number: newNumber
-    }));
+
+    const addPerson = async () => {
+      const person = {
+        name: newName,
+        number: newNumber
+      };
+
+      const returnedPerson = await PersonService.post(person);
+
+      setPersons(persons.concat(returnedPerson));
+      setNotification({
+        type: 'alert',
+        message: `Added ${person.name}`
+      });
+
+      setTimeout(() => {
+        setNotification()
+      }, 5000);
+    }
+
+    const updatePerson = async (person) => {
+      person = { 
+        ...person,
+        name: newName,
+        number: newNumber
+      };
+
+      const updatedPerson = await PersonService.put(person.id, person);
+
+      setPersons(persons.map(p => p.id === person.id ? updatedPerson : p));
+      setNotification({
+        type: 'alert',
+        message: `Updated ${person.name}`
+      });
+    }
+
+    const person = persons.find(p => p.name === newName);
+
+    if (person) {
+      if (window.confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`)) {
+        updatePerson(person);
+      }
+    } else {
+      addPerson();
+    }
+  };
+
+  const handleDeletePerson = (person) => {
+    const deletePerson = async () => {
+      try {
+        await PersonService.remove(person.id);
+      } catch (error) {
+        setNotification({
+          type: 'error',
+          message: `Information of ${person.name} has already been removed from server`
+        });
+
+        setTimeout(() => {
+          setNotification()
+        }, 5000);
+      }
+
+      setPersons(persons.filter(p => p.id !== person.id));
+    }
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      deletePerson();
+    }
   };
 
   const personsToRender = searchTerm !== ''
@@ -57,6 +121,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} />
       <Filter value={searchTerm}
               onChange={handleNewSearchTermChange} />
 
@@ -68,9 +133,10 @@ const App = () => {
                   handleSubmit={handlePersonFormSubmit}/>
 
       <h3>Numbers</h3>
-      <Persons persons={personsToRender} />
+      <Persons persons={personsToRender}
+               onDeletePerson={handleDeletePerson} />
     </div>
   )
 }
 
-export default App
+export default App;
