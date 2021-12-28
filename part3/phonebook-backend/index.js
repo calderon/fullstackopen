@@ -1,11 +1,16 @@
 const express = require("express");
+const cors = require('cors')
 const morgan = require('morgan');
 
 const Database = require("./helpers/db");
 const db = new Database('./db/persons.json');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+
+app.use(
+  cors()
+);
 
 app.use(
   express.json()
@@ -55,8 +60,7 @@ app.get('/api/persons/:id', async (request, response) => {
     response.json(person);
   } else {
     response
-      .status(404)
-      .send(404)
+      .sendStatus(404)
       .end();
   }
 });
@@ -100,6 +104,36 @@ app.post('/api/persons/', async (request, response) => {
   await db.save(persons);
 });
 
+app.put('/api/persons/:id', async (request, response) => {
+  const body = request.body;
+
+  if (!body.name) {
+    return response.sendStatus(400).json({
+      error: 'name is missing'
+    });
+  }
+
+  if (!body.number) {
+    return response.sendStatus(400).json({
+      error: 'number is missing'
+    });
+  }
+
+  let persons = await db.read();
+  let person = persons.find(p => p.id === Number(request.params.id));
+
+  if (person) {
+    person = { ...person, name: body.name, number: body.number }
+    persons = persons.map(p => p.id === person.id ? person : p);
+    response.json(person);
+    await db.save(persons);
+  } else {
+    response
+      .sendStatus(404)
+      .end();
+  }
+});
+
 app.delete('/api/persons/:id', async (request, response) => {
   const deletedId = Number(request.params.id);
   let persons = await db.read();
@@ -117,7 +151,7 @@ app.delete('/api/persons/:id', async (request, response) => {
         .end();
     }
 
-    response.send(204).end();
+    response.sendStatus(204).end();
   } else {
     response
       .sendStatus(404)

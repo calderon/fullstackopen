@@ -42,18 +42,25 @@ const App = () => {
     evt.preventDefault();
 
     const addPerson = async () => {
-      const person = {
-        name: newName,
-        number: newNumber
-      };
+      try {
+        const person = {
+          name: newName,
+          number: newNumber
+        };
 
-      const returnedPerson = await PersonService.post(person);
+        const returnedPerson = await PersonService.post(person);
 
-      setPersons(persons.concat(returnedPerson));
-      setNotification({
-        type: 'alert',
-        message: `Added ${person.name}`
-      });
+        setPersons(persons.concat(returnedPerson));
+        setNotification({
+          type: 'alert',
+          message: `Added ${person.name}`
+        });
+      } catch (err) {
+        setNotification({
+          type: 'error',
+          message: err.response.data.error
+        });
+      }
 
       setTimeout(() => {
         setNotification()
@@ -61,19 +68,26 @@ const App = () => {
     }
 
     const updatePerson = async (person) => {
-      person = { 
-        ...person,
-        name: newName,
-        number: newNumber
-      };
+      try {
+        person = {
+          ...person,
+          name: newName,
+          number: newNumber
+        };
 
-      const updatedPerson = await PersonService.put(person.id, person);
+        const updatedPerson = await PersonService.put(person.id, person);
 
-      setPersons(persons.map(p => p.id === person.id ? updatedPerson : p));
-      setNotification({
-        type: 'alert',
-        message: `Updated ${person.name}`
-      });
+        setPersons(persons.map(p => p.id === person.id ? updatedPerson : p));
+        setNotification({
+          type: 'alert',
+          message: `Updated ${person.name}`
+        });
+      } catch (err) {
+        setNotification({
+          type: 'error',
+          message: err.response.data.error
+        });
+      }
     }
 
     const person = persons.find(p => p.name === newName);
@@ -91,16 +105,21 @@ const App = () => {
     const deletePerson = async () => {
       try {
         await PersonService.remove(person.id);
+
+        setNotification({
+          type: 'alert',
+          message: `${person.name} has been removed from server`
+        });
       } catch (error) {
         setNotification({
           type: 'error',
           message: `Information of ${person.name} has already been removed from server`
         });
-
-        setTimeout(() => {
-          setNotification()
-        }, 5000);
       }
+
+      setTimeout(() => {
+        setNotification()
+      }, 5000);
 
       setPersons(persons.filter(p => p.id !== person.id));
     }

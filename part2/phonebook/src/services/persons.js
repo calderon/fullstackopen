@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'http://localhost:3001/persons';
+const baseURL = '/api/persons';
 
 const get = async () => {
   const request = await axios.get(baseURL);
@@ -26,6 +26,6 @@ const remove = async (id) => {
   return request.data;
 }
 
-const PersonAPI = { get, post, put, remove };
+const PersonService = { get, post, put, remove };
 
-export default PersonAPI;
+export default PersonService;
