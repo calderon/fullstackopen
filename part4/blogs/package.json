@@ -4,19 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
-    "test": "jest --verbose",
-    "test:watch": "jest --watchAll"
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watchAll"
   },
   "keywords": [],
   "author": "Daniel Calderón",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.5.0",
     "jest": "^27.4.5",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.1.6"
   },
   "dependencies": {
     "cors": "^2.8.5",
