@@ -1,8 +1,10 @@
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 const cors = require('cors')
 const morgan = require('morgan');
 
-const Database = require("./helpers/db");
+const Person = require('./models/person');
+const Database = require('./helpers/db');
 const db = new Database('./db/persons.json');
 
 const app = express();
@@ -16,9 +18,7 @@ app.use(
   express.json()
 );
 
-morgan.token('body', (req, res) => {
-  return JSON.stringify(req.body);
-});
+morgan.token('body', (req, res) => JSON.stringify(req.body));
 
 app.use(
   morgan((tokens, req, res) => {
@@ -41,12 +41,12 @@ app.use(
 );
 
 app.get('/info', async (request, response) => {
-  const persons = await db.read();
+  const persons = await Person.find({});
   response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>`);
 });
 
 app.get('/api/persons', async (request, response) => {
-  const persons = await db.read();
+  const persons = await Person.find({});
 
   response.json(persons);
 });
