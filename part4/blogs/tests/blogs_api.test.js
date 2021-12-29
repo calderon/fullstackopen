@@ -9,10 +9,11 @@ const Blog = require('../models/blog')
 beforeEach(async () => {
   await Blog.deleteMany({})
 
-  for (let index = 0; index < helper.initialBlogs.length; index++) {
-    let blogObject = new Blog(helper.initialBlogs[index])
-    await blogObject.save()
-  }
+  const blogObjects = helper.initialBlogs
+    .map(note => new Blog(note))
+  const promiseArray = blogObjects.map(blog => blog.save())
+
+  await Promise.all(promiseArray)
 })
 
 test('blogs are returned as json', async () => {
