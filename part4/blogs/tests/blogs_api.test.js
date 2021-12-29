@@ -90,6 +90,20 @@ test('a new blog contains title and url', async () => {
     .post('/api/blogs')
     .send(invalidBlog)
     .expect(400)
+
+  invalidBlog.title = 'Title'
+
+  await api
+    .post('/api/blogs')
+    .send(invalidBlog)
+    .expect(400)
+
+  invalidBlog.url = 'http://danielcalderon.dev/blog'
+
+  await api
+    .post('/api/blogs')
+    .send(invalidBlog)
+    .expect(201)
 })
 
 afterAll(() => {
