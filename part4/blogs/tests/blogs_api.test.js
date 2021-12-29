@@ -82,6 +82,19 @@ test('a blog has an id', async () => {
   expect(blog.id).toBeDefined()
 })
 
+test('post request adds a new blog correctly', async () => {
+  const blogResponse = await api.post('/api/blogs', {
+    title: 'Daniel Calderon Blog',
+    author: 'Daniel Calderon',
+    url: 'http://danielcalderon.dev/blog',
+    likes: 0
+  })
+
+  const blogsResponse = await api.get('/api/blogs')
+  expect(blogsResponse.body.length).toBe(initialBlogs.length + 1)
+  expect(blogsResponse.body).toContainEqual(blogResponse.body)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
