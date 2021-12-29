@@ -101,4 +101,26 @@ describe('favorite blog', () => {
     const mostFavorited = listHelper.favoriteBlog(blogs)
     expect(mostFavorited).toEqual(blog3)
   })
-});
+})
+
+describe('most blogs', () => {
+  test('gets author with more blogs', () => {
+    const mostBlogs = listHelper.mostBlogs(blogs)
+
+    expect(mostBlogs).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3
+    })
+  })
+})
+
+describe('most likes', () => {
+  test('gets author with more blogs', () => {
+    const mostLikes = listHelper.mostLikes(blogs)
+
+    expect(mostLikes).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17
+    })
+  })
+})
