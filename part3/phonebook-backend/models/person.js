@@ -1,11 +1,28 @@
-const mongoose = require('mongoose');
-const url = process.env.MONGODB_URI;
-mongoose.connect(url);
+const mongoose = require('mongoose')
+const uniqueValidator = require('mongoose-unique-validator')
+
+// eslint-disable-next-line no-undef
+const url = process.env.MONGODB_URI
+mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String
-});
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    minlength: 3
+  },
+  number: {
+    type: String,
+    required: true,
+    unique: true,
+    minlength: 8
+  }
+})
+
+personSchema.plugin(uniqueValidator, {
+  message: 'Expected {PATH} to be unique.'
+})
 
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -13,6 +30,6 @@ personSchema.set('toJSON', {
     delete returnedObject._id
     delete returnedObject.__v
   }
-});
+})
 
-module.exports = mongoose.model('Person', personSchema);
+module.exports = mongoose.model('Person', personSchema)
