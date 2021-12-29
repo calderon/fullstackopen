@@ -95,6 +95,16 @@ test('post request adds a new blog correctly', async () => {
   expect(blogsResponse.body).toContainEqual(blogResponse.body)
 })
 
+test('a new blog has zero likes by default', async () => {
+  const blogResponse = await api.post('/api/blogs', {
+    title: 'Daniel Calderon Blog',
+    author: 'Daniel Calderon',
+    url: 'http://danielcalderon.dev/blog'
+  })
+
+  expect(blogResponse.body.likes).toBe(0)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
