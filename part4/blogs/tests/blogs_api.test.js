@@ -114,7 +114,6 @@ describe('addition of a new blog', () => {
 describe('deletion of a blog', () => {
   test('succeeds if id is valid', async () => {
     const blogsBeforeDelete = await helper.blogsInDb()
-    console.log(blogsBeforeDelete)
     const blogToDelete = blogsBeforeDelete[0]
 
     await api
