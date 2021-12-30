@@ -124,7 +124,33 @@ describe('deletion of a blog', () => {
 
     expect(blogsAfterDelete).toHaveLength(blogsBeforeDelete.length - 1)
   })
-});
+})
+
+describe('update a blog', () => {
+  test('succeeds if id is valid', async () => {
+    let blogs = await helper.blogsInDb()
+    const blogToUpdate = blogs[0]
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({
+        likes: 999
+      })
+      .expect(200)
+
+    blogs = await helper.blogsInDb()
+    expect(blogs[0].likes).toBe(999)
+  })
+
+  test('fails if id is invalid', async () => {
+    await api
+      .put('/api/blogs/0')
+      .send({
+        likes: 999
+      })
+      .expect(400)
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()
