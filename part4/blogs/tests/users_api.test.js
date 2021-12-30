@@ -73,29 +73,66 @@ describe('POST', () => {
       .toContain(userData.username)
   })
 
-  it('fails with invalid data', async () => {
-    const userData = {
-      name: 'Invalid user'
-    }
+  it('name, username and password are required', async () => {
+    const userData = {}
 
     await api
       .post('/api/users')
       .send(userData)
       .expect(400)
 
-    userData.username = 'Invalid user'
+    userData.name = 'Invalid user'
 
     await api
       .post('/api/users')
       .send(userData)
       .expect(400)
 
-    userData.password = 'nowisvalid'
+    userData.username = 'invalid'
+
+    await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+
+    userData.password = 'nowIsValid'
 
     await api
       .post('/api/users')
       .send(userData)
       .expect(201)
+  })
+
+  it('password length is bigger than 3', async () => {
+    const userData = {
+      name: 'Invalid user',
+      username: 'invalid',
+      password: 'in'
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('Password must be 3 or more characters')
+  })
+
+  it('username length is bigger than 3', async () => {
+    const userData = {
+      name: 'Invalid user',
+      username: 'in',
+      password: 'invalid'
+    }
+
+    const response = await api
+      .post('/api/users')
+      .send(userData)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toContain('User validation failed: username')
   })
 })
 
