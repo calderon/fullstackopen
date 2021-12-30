@@ -19,19 +19,10 @@ mongoose
   .then(logger.info('connected to MongoDB'))
   .catch(error => logger.error('error connecting to MongoDB:', error.message))
 
-app.use(
-  cors()
-)
-
-app.use(
-  express.json()
-)
-
-app.use(
-  express.json()
-)
-
+app.use(cors())
+app.use(express.json())
 app.use(middleware.requestLogger)
+app.use(middleware.tokenExtractor)
 
 app.use('/api/login', loginRouter)
 app.use('/api/blogs', blogsRouter)
