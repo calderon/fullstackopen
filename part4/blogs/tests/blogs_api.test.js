@@ -64,7 +64,19 @@ describe('GET /api/blogs', () => {
   })
 })
 
-describe('POST /api/blogs', () => {
+describe('POST /api/blogs Unauthorized', () => {
+  test('fails', async () => {
+    const response = await api
+      .post('/api/blogs/')
+      .send({})
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toBe('token missing or invalid')
+  })
+})
+
+describe('POST /api/blogs Authorized', () => {
   test('succeeds with valid data', async () => {
     const blog = {
       title: 'Daniel Calderon Blog',
@@ -75,6 +87,7 @@ describe('POST /api/blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(blog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -97,6 +110,7 @@ describe('POST /api/blogs', () => {
 
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(blog)
 
     expect(response.body.likes).toBe(0)
@@ -109,6 +123,7 @@ describe('POST /api/blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(invalidBlog)
       .expect(400)
 
@@ -116,6 +131,7 @@ describe('POST /api/blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(invalidBlog)
       .expect(400)
 
@@ -123,6 +139,7 @@ describe('POST /api/blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(invalidBlog)
       .expect(201)
   })
