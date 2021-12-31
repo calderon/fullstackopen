@@ -1,22 +1,39 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
 
+const config = require('../utils/config')
 const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
+let token
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const user = await new User(helper.initialUsers[0]).save()
+  token = jwt.sign({
+    username: user.username,
+    id: user.id
+  }, config.SECRET)
 
   const blogObjects = helper.initialBlogs
-    .map(note => new Blog(note))
+    .map(blog => {
+      blog.user = user.id
+
+      return new Blog(blog)
+    })
+
   const promiseArray = blogObjects.map(blog => blog.save())
 
   await Promise.all(promiseArray)
 })
 
-describe('when there is initially some blogs saved', () => {
+describe('GET /api/blogs', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -47,7 +64,7 @@ describe('when there is initially some blogs saved', () => {
   })
 })
 
-describe('addition of a new blog', () => {
+describe('POST /api/blogs', () => {
   test('succeeds with valid data', async () => {
     const blog = {
       title: 'Daniel Calderon Blog',
@@ -111,13 +128,28 @@ describe('addition of a new blog', () => {
   })
 })
 
-describe('deletion of a blog', () => {
+describe('DELETE /api/blogs/:id Unauthorized', () => {
+  test('fails', async () => {
+    const blogsBeforeDelete = await helper.blogsInDb()
+    const blogToDelete = blogsBeforeDelete[0]
+
+    const response = await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    expect(response.body.error).toBe('token missing or invalid')
+  })
+})
+
+describe('DELETE /api/blogs/:id Authorized', () => {
   test('succeeds if id is valid', async () => {
     const blogsBeforeDelete = await helper.blogsInDb()
     const blogToDelete = blogsBeforeDelete[0]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(204)
 
     const blogsAfterDelete = await helper.blogsInDb()
@@ -126,7 +158,7 @@ describe('deletion of a blog', () => {
   })
 })
 
-describe('update a blog', () => {
+describe('UPDATE /api/blogs/:id', () => {
   test('succeeds if id is valid', async () => {
     let blogs = await helper.blogsInDb()
     const blogToUpdate = blogs[0]
